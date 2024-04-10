@@ -3,6 +3,9 @@ from aws_cdk import (
     Stack,
     aws_lambda as lambda_,
     aws_iam as iam,
+    aws_s3 as s3,
+    aws_opensearchservice as opensearch,
+    aws_ec2 as ec2,
     Duration
     # aws_sqs as sqs,
 )
