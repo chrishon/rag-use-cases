@@ -31,6 +31,21 @@ class NetworkingStack(Stack):
             nat_gateways=0,
         )
 
+        self.primary_vpc.add_interface_endpoint(
+            "BedrockEndpoint",
+            service=ec2.InterfaceVpcEndpointAwsService.BEDROCK,
+            subnets=ec2.SubnetSelection(
+                availability_zones=["us-east-1a", "us-east-1c"]
+            ),
+        )
+        self.primary_vpc.add_interface_endpoint(
+            "BedrockRuntimeEndpoint",
+            service=ec2.InterfaceVpcEndpointAwsService.BEDROCK_RUNTIME,
+            subnets=ec2.SubnetSelection(
+                availability_zones=["us-east-1a", "us-east-1c"]
+            ),
+        )
+
         CfnOutput(self, "VpcId", value=self.primary_vpc.vpc_id)
 
         for index, subnet in enumerate(self.primary_vpc.isolated_subnets):

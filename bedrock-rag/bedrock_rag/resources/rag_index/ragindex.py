@@ -1,5 +1,6 @@
 import json
 import boto3
+import langchain
 
 bedrock = boto3.client("bedrock-runtime")
 
@@ -44,7 +45,27 @@ def indexer(event, context):
         body=body, modelId=modelId, accept=accept, contentType=contentType
     )
 
+    # embedding = get_vector_embedding(
+    #     question,
+    #     bedrock_client,
+    #     "amazon.titan-embed-text-v1",  ## TODO adapt modelID for current model
+    # )
+
     response_body = json.loads(response.get("body").read())
     # text
     response_text = response_body["results"][0]["outputText"]
     return {"statusCode": 200, "body": response_text}
+
+
+def get_vector_embedding(text, bedrock_client, modelId):
+
+    response = bedrock_client.invoke_model(
+        body=json.dumps({"inputText": text}),
+        modelId=modelId,
+        accept="application/json",
+        contentType="application/json",
+    )
+
+    response_body = json.loads(response.get("body").read())
+
+    return response_body.get("embedding")
