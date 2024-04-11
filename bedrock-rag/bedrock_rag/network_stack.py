@@ -17,8 +17,8 @@ class NetworkingStack(Stack):
         self.primary_vpc = ec2.Vpc(
             self,
             "PrimaryVPC",
-            cidr="192.168.0.0/24",
-            max_azs=3,
+            ip_addresses=ec2.IpAddresses.cidr("192.168.0.0/20"),
+            availability_zones=["eu-central-1a", "eu-central-1b", "eu-central-1c"],
             subnet_configuration=[
                 ec2.SubnetConfiguration(
                     name="Private",
@@ -31,27 +31,31 @@ class NetworkingStack(Stack):
             nat_gateways=0,
         )
 
-        self.primary_vpc.add_interface_endpoint(
-            "BedrockEndpoint",
-            service=ec2.InterfaceVpcEndpointAwsService.BEDROCK,
-            subnets=ec2.SubnetSelection(
-                availability_zones=["us-east-1a", "us-east-1c"]
-            ),
-        )
-        self.primary_vpc.add_interface_endpoint(
-            "BedrockRuntimeEndpoint",
-            service=ec2.InterfaceVpcEndpointAwsService.BEDROCK_RUNTIME,
-            subnets=ec2.SubnetSelection(
-                availability_zones=["us-east-1a", "us-east-1c"]
-            ),
+        private_subnets = self.primary_vpc.select_subnets(
+            subnet_type=ec2.SubnetType.PRIVATE_ISOLATED
         )
 
-        CfnOutput(self, "VpcId", value=self.primary_vpc.vpc_id)
+        # self.primary_vpc.add_interface_endpoint(
+        #     "BedrockEndpoint",
+        #     service=ec2.InterfaceVpcEndpointAwsService.BEDROCK,
+        #     subnets=ec2.SubnetSelection(
+        #         availability_zones=["eu-central-1a", "eu-central-1b"]
+        #     ),
+        # )
+        # self.primary_vpc.add_interface_endpoint(
+        #     "BedrockRuntimeEndpoint",
+        #     service=ec2.InterfaceVpcEndpointAwsService.BEDROCK_RUNTIME,
+        #     subnets=ec2.SubnetSelection(
+        #         availability_zones=["eu-central-1a", "eu-central-1b"]
+        #     ),
+        # )
 
-        for index, subnet in enumerate(self.primary_vpc.isolated_subnets):
-            CfnOutput(self, f"PrivateSubnet{index + 1}Id", value=subnet.subnet_id)
-        CfnOutput(
-            self,
-            "DefaultSecurityGroupID",
-            value=self.primary_vpc.vpc_default_security_group,
-        )
+        # CfnOutput(self, "VpcId", value=self.primary_vpc.vpc_id)
+
+        # for index, subnet in enumerate(self.primary_vpc.isolated_subnets):
+        #     CfnOutput(self, f"PrivateSubnet{index + 1}Id", value=subnet.subnet_id)
+        # CfnOutput(
+        #     self,
+        #     "DefaultSecurityGroupID",
+        #     value=self.primary_vpc.vpc_default_security_group,
+        # )
