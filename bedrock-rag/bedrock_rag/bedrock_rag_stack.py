@@ -6,10 +6,11 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_opensearchservice as opensearch,
     aws_ec2 as ec2,
-    Duration
+    Duration,
     # aws_sqs as sqs,
 )
 from constructs import Construct
+
 
 class BedrockRagStack(Stack):
 
@@ -25,53 +26,56 @@ class BedrockRagStack(Stack):
         # )
 
         llm_handler = lambda_.Function(
-            self, "LLMHandler",
+            self,
+            "LLMHandler",
             runtime=lambda_.Runtime.PYTHON_3_10,
             handler="llm_handler.llm_handler",  # Assuming index.py with a function named handler
             code=lambda_.Code.from_asset("bedrock_rag/resources/llm_function"),
             memory_size=256,
-            timeout=Duration.seconds(60*5),
+            timeout=Duration.seconds(60 * 5),
         )
 
-        llm_handler.add_to_role_policy(iam.PolicyStatement(
-        effect=iam.Effect.ALLOW,
-        actions=[
-            "bedrock:InvokeModel",
-            "bedrock:InvokeModelWithResponseStream"
-        ],
-        resources=["arn:aws:bedrock:*::foundation-model/*"]
-        ))
-
-        
+        llm_handler.add_to_role_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "bedrock:InvokeModel",
+                    "bedrock:InvokeModelWithResponseStream",
+                ],
+                resources=["arn:aws:bedrock:*::foundation-model/*"],
+            )
+        )
 
         ######################################
         ######## S3 Bucket
 
-        bucket = s3.Bucket(self, "KnowledgeBaseDocuments",
-            bucket_name="Rag-knowledge-base", # specify a unique bucket name
+        bucket = s3.Bucket(
+            self,
+            "KnowledgeBaseDocuments",
+            bucket_name="Rag-knowledge-base",  # specify a unique bucket name
         )
 
         ######################################
         ######## OpenSearch
 
-        
-
         index_handler = lambda_.Function(
-            self, "RAGIndexHandler",
+            self,
+            "RAGIndexHandler",
             runtime=lambda_.Runtime.PYTHON_3_10,
             handler="ragindex.indexer",  # Assuming index.py with a function named handler
             code=lambda_.Code.from_asset("bedrock_rag/resources/rag_index"),
             memory_size=256,
-            timeout=Duration.seconds(60*5),
+            timeout=Duration.seconds(60 * 5),
         )
 
-        index_handler.add_to_role_policy(iam.PolicyStatement(
-        effect=iam.Effect.ALLOW,
-        actions=[
-            "bedrock:InvokeModel",
-            "bedrock:InvokeModelWithResponseStream"
-            #adapt for s3 & OpenSearch
-        ],
-        resources=["arn:aws:bedrock:*::foundation-model/*"]
-        
-    ))
+        index_handler.add_to_role_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "bedrock:InvokeModel",
+                    "bedrock:InvokeModelWithResponseStream",
+                    # adapt for s3 & OpenSearch
+                ],
+                resources=["arn:aws:bedrock:*::foundation-model/*"],
+            )
+        )
