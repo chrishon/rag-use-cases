@@ -5,14 +5,13 @@ from aws_cdk import (
     aws_ssm as ssm,
     aws_iam as iam,
     CfnOutput,
+    triggers,
 )
 from constructs import Construct
 
 
 class NetworkingStack(Stack):
-    def __init__(
-        self, scope: Construct, construct_id: str, stage_id, deploy_sm_domain, **kwargs
-    ) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         self.primary_vpc = ec2.Vpc(
@@ -23,7 +22,7 @@ class NetworkingStack(Stack):
             subnet_configuration=[
                 ec2.SubnetConfiguration(
                     name="Private",
-                    subnet_type=ec2.SubnetType.PRIVATE_WITH_NAT,
+                    subnet_type=ec2.SubnetType.PRIVATE_ISOLATED,
                     cidr_mask=26,
                 ),
             ],
@@ -33,7 +32,8 @@ class NetworkingStack(Stack):
         )
 
         CfnOutput(self, "VpcId", value=self.primary_vpc.vpc_id)
-        for index, subnet in enumerate(self.primary_vpc.private_subnets):
+
+        for index, subnet in enumerate(self.primary_vpc.isolated_subnets):
             CfnOutput(self, f"PrivateSubnet{index + 1}Id", value=subnet.subnet_id)
         CfnOutput(
             self,
