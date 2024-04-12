@@ -1,3 +1,5 @@
+# adapted from https://github.com/aws-samples/aws-opensearch-ingestion-tutorials/blob/main/opensearch/cdk_stacks/ops.py
+
 from aws_cdk import (
     # Duration,
     Stack,
@@ -6,8 +8,13 @@ from aws_cdk import (
     aws_opensearchservice as opensearch,
     Duration,
     # aws_sqs as sqs,
+    Fn,
+    aws_ec2 as ec2,
 )
 from constructs import Construct
+
+from typing import List, Sequence
+from .network_stack import NetworkingStack
 
 
 class VectorDBStack(Stack):
@@ -16,8 +23,8 @@ class VectorDBStack(Stack):
         self,
         scope: Construct,
         construct_id: str,
-        vpc_id: str,
-        private_subnet_ids: list,
+        vpc: ec2.IVpc = None,
+        subnets: List[ec2.Subnet] = [],
         **kwargs
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -30,6 +37,15 @@ class VectorDBStack(Stack):
             encryption_at_rest=opensearch.EncryptionAtRestOptions(
                 enabled=True,
             ),
-            vpc=vpc_id,  ##?ref auf arn??
-            vpc_subnets=private_subnet_ids,
+            capacity={
+                "master_nodes": 3,
+                "master_node_instance_type": "r6g.large.search",
+                "data_nodes": 3,
+                "data_node_instance_type": "r6g.large.search",
+            },
+            ebs={"volume_size": 10, "volume_type": ec2.EbsDeviceVolumeType.GP3},
+            zone_awareness=opensearch.ZoneAwarenessConfig(
+                enabled=True, availability_zone_count=3
+            ),
+            vpc=vpc,
         )
