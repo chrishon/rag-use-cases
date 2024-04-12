@@ -35,27 +35,27 @@ class NetworkingStack(Stack):
             subnet_type=ec2.SubnetType.PRIVATE_ISOLATED
         )
 
-        # self.primary_vpc.add_interface_endpoint(
-        #     "BedrockEndpoint",
-        #     service=ec2.InterfaceVpcEndpointAwsService.BEDROCK,
-        #     subnets=ec2.SubnetSelection(
-        #         availability_zones=["eu-central-1a", "eu-central-1b"]
-        #     ),
-        # )
-        # self.primary_vpc.add_interface_endpoint(
-        #     "BedrockRuntimeEndpoint",
-        #     service=ec2.InterfaceVpcEndpointAwsService.BEDROCK_RUNTIME,
-        #     subnets=ec2.SubnetSelection(
-        #         availability_zones=["eu-central-1a", "eu-central-1b"]
-        #     ),
-        # )
+        self.primary_vpc.add_interface_endpoint(
+            "BedrockEndpoint",
+            service=ec2.InterfaceVpcEndpointAwsService.BEDROCK,
+            subnets=ec2.SubnetSelection(
+                availability_zones=["eu-central-1a", "eu-central-1b", "eu-central-1c"]
+            ),
+        )
+        self.primary_vpc.add_interface_endpoint(
+            "BedrockRuntimeEndpoint",
+            service=ec2.InterfaceVpcEndpointAwsService.BEDROCK_RUNTIME,
+            subnets=ec2.SubnetSelection(
+                availability_zones=["eu-central-1a", "eu-central-1b", "eu-central-1c"]
+            ),
+        )
 
-        # CfnOutput(self, "VpcId", value=self.primary_vpc.vpc_id)
+        CfnOutput(self, "VpcId", value=self.primary_vpc.vpc_id)
 
-        # for index, subnet in enumerate(self.primary_vpc.isolated_subnets):
-        #     CfnOutput(self, f"PrivateSubnet{index + 1}Id", value=subnet.subnet_id)
-        # CfnOutput(
-        #     self,
-        #     "DefaultSecurityGroupID",
-        #     value=self.primary_vpc.vpc_default_security_group,
-        # )
+        for index, subnet in enumerate(self.primary_vpc.isolated_subnets):
+            CfnOutput(self, f"PrivateSubnet{index + 1}Id", value=subnet.subnet_id)
+        CfnOutput(
+            self,
+            "DefaultSecurityGroupID",
+            value=self.primary_vpc.vpc_default_security_group,
+        )
