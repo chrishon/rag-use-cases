@@ -31,10 +31,6 @@ class NetworkingStack(Stack):
             nat_gateways=0,
         )
 
-        private_subnets = self.primary_vpc.select_subnets(
-            subnet_type=ec2.SubnetType.PRIVATE_ISOLATED
-        )
-
         self.primary_vpc.add_interface_endpoint(
             "BedrockEndpoint",
             service=ec2.InterfaceVpcEndpointAwsService.BEDROCK,

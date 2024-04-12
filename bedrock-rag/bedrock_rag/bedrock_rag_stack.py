@@ -47,16 +47,7 @@ class BedrockRagStack(Stack):
         )
 
         ######################################
-        ######## S3 Bucket
-
-        bucket = s3.Bucket(
-            self,
-            "KnowledgeBaseDocuments",
-            bucket_name="Rag-knowledge-base",  # specify a unique bucket name
-        )
-
-        ######################################
-        ######## OpenSearch
+        ######## indexing Lambda
 
         index_handler = lambda_.Function(
             self,
