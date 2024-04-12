@@ -22,7 +22,7 @@ class NetworkingStack(Stack):
             subnet_configuration=[
                 ec2.SubnetConfiguration(
                     name="Private",
-                    subnet_type=ec2.SubnetType.PRIVATE_ISOLATED,
+                    subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS,
                     cidr_mask=26,
                 ),
             ],
@@ -44,6 +44,33 @@ class NetworkingStack(Stack):
             subnets=ec2.SubnetSelection(
                 availability_zones=["eu-central-1a", "eu-central-1b", "eu-central-1c"]
             ),
+        )
+
+        # VPC ID parameters
+        vpc_id_param = ssm.StringParameter(
+            self,
+            "VPCIDParameter",
+            parameter_name=f"/vpc/id",
+            string_value=self.primary_vpc.vpc_id,
+        )
+
+        # Private Subnet IDs parameters
+        private_subnet_ids_param = ssm.StringListParameter(
+            self,
+            "PrivateSubnetIDsParameter",
+            parameter_name=f"/vpc/subnets/private/ids",
+            string_list_value=[
+                subnet.subnet_id for subnet in self.primary_vpc.private_subnets
+            ],
+        )
+
+        # Subnet IDs parameters
+
+        default_sg_id_param = ssm.StringParameter(
+            self,
+            "DefaultSecurityGroupIDParameter",
+            parameter_name=f"/vpc/sg/id",
+            string_value=self.primary_vpc.vpc_default_security_group,
         )
 
         CfnOutput(self, "VpcId", value=self.primary_vpc.vpc_id)
