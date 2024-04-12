@@ -3,7 +3,6 @@ from aws_cdk import (
     Stack,
     aws_lambda as lambda_,
     aws_iam as iam,
-    aws_s3 as s3,
     aws_opensearchservice as opensearch,
     aws_ec2 as ec2,
     Duration,
@@ -14,16 +13,15 @@ from constructs import Construct
 
 class BedrockRagStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(
+        self,
+        scope: Construct,
+        construct_id: str,
+        vpc_id: str,
+        private_subnet_ids: list,
+        **kwargs
+    ) -> None:
         super().__init__(scope, construct_id, **kwargs)
-
-        # The code that defines your stack goes here
-
-        # example resource
-        # queue = sqs.Queue(
-        #     self, "BedrockRagQueue",
-        #     visibility_timeout=Duration.seconds(300),
-        # )
 
         llm_handler = lambda_.Function(
             self,
@@ -47,7 +45,7 @@ class BedrockRagStack(Stack):
         )
 
         ######################################
-        ######## indexing Lambda
+        ######## Indexing Lambda
 
         index_handler = lambda_.Function(
             self,
