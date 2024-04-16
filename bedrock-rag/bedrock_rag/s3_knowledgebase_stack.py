@@ -16,8 +16,8 @@ class S3Stack(Stack):
         ######################################
         ######## S3 Bucket
 
-        bucket = s3.Bucket(
+        self.bucket = s3.Bucket(
             self,
             "KnowledgeBaseDocuments",
-            bucket_name="Rag-knowledge-base",  # specify a unique bucket name
+            bucket_name="rag-knowledge-base-trc-testcase",  # specify a unique bucket name
         )
