@@ -150,3 +150,6 @@ class VectorDBServerlessStack(Stack):
             value=collection.attr_dashboard_endpoint,
             export_name=f"{self.stack_name}-DashboardsURL",
         )
+
+
+# TODO: Create Vector Index in CDK
