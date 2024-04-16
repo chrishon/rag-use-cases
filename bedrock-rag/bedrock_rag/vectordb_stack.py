@@ -38,14 +38,14 @@ class VectorDBStack(Stack):
                 enabled=True,
             ),
             capacity={
-                "master_nodes": 3,
-                "master_node_instance_type": "r6g.large.search",
-                "data_nodes": 3,
-                "data_node_instance_type": "r6g.large.search",
+                "master_nodes": 1,
+                "master_node_instance_type": "t3.small.search",
+                "data_nodes": 1,
+                "data_node_instance_type": "t3.small.search",
             },
             ebs={"volume_size": 10, "volume_type": ec2.EbsDeviceVolumeType.GP3},
             zone_awareness=opensearch.ZoneAwarenessConfig(
-                enabled=True, availability_zone_count=3
+                enabled=True, availability_zone_count=1
             ),
             vpc=vpc,
         )
