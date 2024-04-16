@@ -8,14 +8,23 @@ from bedrock_rag.network_stack import NetworkingStack
 from bedrock_rag.vectordb_stack import VectorDBStack
 from bedrock_rag.s3_knowledgebase_stack import S3Stack
 
+from config.constants import DEFAULT_DEPLOYMENT_REGION, DEFAULT_ACCOUNT
+
 
 app = cdk.App()
-s3Stack = S3Stack(app, "S3Stack")
-networkStack = NetworkingStack(app, "NetworkStack")
-vectorDBStack = VectorDBStack(app, "VectorDBStack", vpc_id=networkStack.primary_vpc)
-BedrockRagStack(
+env = cdk.Environment(account=DEFAULT_ACCOUNT, region=DEFAULT_DEPLOYMENT_REGION)
+# s3Stack = S3Stack(app, "S3Stack", env=env)
+networkStack = NetworkingStack(app, "NetworkStack", env=env)
+vectorDBStack = VectorDBStack(
     app,
-    "BedrockRagStack",
-    vpc_id=networkStack.primary_vpc,
+    "VectorDBStack",
+    vpc=networkStack.primary_vpc,
+    subnets=networkStack.primary_vpc.isolated_subnets,
+    env=env,
 )
+# BedrockRagStack(
+#     app,
+#     "BedrockRagStack",
+#     vpc_id=networkStack.primary_vpc,
+# )
 app.synth()
