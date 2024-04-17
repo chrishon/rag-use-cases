@@ -9,6 +9,7 @@ from aws_cdk import (
     Fn,
     aws_ec2 as ec2,
     CfnOutput,
+    CustomResource,
 )
 from constructs import Construct
 
@@ -155,6 +156,57 @@ class VectorDBServerlessStack(Stack):
             "DashboardsURL",
             value=collection.attr_dashboard_endpoint,
             export_name=f"{self.stack_name}-DashboardsURL",
+        )
+
+        index_function = lambda_.Function(
+            self,
+            "LLMHandler",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="index_function.index_handler",  # Assuming index.py with a function named handler
+            code=lambda_.Code.from_asset("bedrock_rag/resources/index_creator"),
+            memory_size=256,
+            timeout=Duration.seconds(60 * 5),
+            environment={
+                "opensearch_endpoint": collection.attr_collection_endpoint,
+                "vector_index_name": "vector-index",
+                "collection_name": collection_name,
+            },
+        )
+
+        opensearch_collection_access = iam.PolicyDocument(
+            actions=[
+                "aoss:CreateCollectionItems",
+                "aoss:DeleteCollectionItems",
+                "aoss:UpdateCollectionItems",
+                "aoss:DescribeCollectionItems",
+            ],
+            resource=f"collection/{collection_name}",
+        )
+        opensearch_data_access = iam.PolicyDocument(
+            actions=[
+                "aoss:CreateIndex",
+                "aoss:DeleteIndex",
+                "aoss:UpdateIndex",
+                "aoss:DescribeIndex",
+                "aoss:ReadDocument",
+                "aoss:WriteDocument",
+            ],
+            resource=f"index/{collection_name}/*",
+        )
+
+        index_function.add_to_role_policy(opensearch_collection_access)
+        index_function.add_to_role_policy(opensearch_data_access)
+
+        custom_resource = CustomResource(
+            self,
+            "MyCustomResource",
+            provider=index_function,
+            properties={
+                "resources_to_configure": [
+                    # Pass ARNs or other identifiers of the resources to configure
+                    # Example: 'arn:aws:s3:::my-bucket'
+                ]
+            },
         )
 
 
