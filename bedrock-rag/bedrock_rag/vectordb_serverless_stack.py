@@ -88,7 +88,7 @@ class VectorDBServerlessStack(Stack):
         )
 
         collection = aoss.CfnCollection(
-            self, id="vectordb", name="vectordb", type="VECTORSEARCH"
+            self, id="vectordb", name=collection_name, type="VECTORSEARCH"
         )
         collection.add_depends_on(cfn_encryption_security_policy)
         collection.add_dependency(cfn_network_security_policy)
@@ -142,7 +142,13 @@ class VectorDBServerlessStack(Stack):
             self,
             "OpenSearchEndpoint",
             value=collection.attr_collection_endpoint,
-            export_name=f"{self.stack_name}-OpenSearchEndpoint",
+            export_name=f"VectorDB-OpenSearchEndpoint",
+        )
+        CfnOutput(
+            self,
+            "CollectionName",
+            value=collection_name,
+            export_name=f"VectorDB-OpenSearch-CollectionName",
         )
         CfnOutput(
             self,
