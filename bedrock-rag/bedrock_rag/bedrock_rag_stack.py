@@ -6,6 +6,7 @@ from aws_cdk import (
     aws_opensearchservice as opensearch,
     aws_ec2 as ec2,
     Duration,
+    Fn,
     # aws_sqs as sqs,
 )
 from constructs import Construct
@@ -19,9 +20,12 @@ class BedrockRagStack(Stack):
         construct_id: str,
         vpc_id: str,
         private_subnet_ids: list,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        opensearch_endpoint = Fn.import_value("VectorDB-OpenSearchEndpoint")
+        collection_name = Fn.import_value("VectorDB-OpenSearch-CollectionName")
 
         llm_handler = lambda_.Function(
             self,
@@ -31,6 +35,7 @@ class BedrockRagStack(Stack):
             code=lambda_.Code.from_asset("bedrock_rag/resources/llm_function"),
             memory_size=256,
             timeout=Duration.seconds(60 * 5),
+            environment={"opensearch_endpoint": opensearch_endpoint},
         )
 
         llm_handler.add_to_role_policy(
@@ -44,27 +49,26 @@ class BedrockRagStack(Stack):
             )
         )
 
-        ######################################
-        ######## Indexing Lambda
-
-        index_handler = lambda_.Function(
-            self,
-            "RAGIndexHandler",
-            runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="ragindex.indexer",  # Assuming index.py with a function named handler
-            code=lambda_.Code.from_asset("bedrock_rag/resources/rag_index"),
-            memory_size=256,
-            timeout=Duration.seconds(60 * 5),
+        opensearch_collection_access = iam.PolicyDocument(
+            actions=[
+                "aoss:CreateCollectionItems",
+                "aoss:DeleteCollectionItems",
+                "aoss:UpdateCollectionItems",
+                "aoss:DescribeCollectionItems",
+            ],
+            resource=f"collection/{collection_name}",
+        )
+        opensearch_data_access = iam.PolicyDocument(
+            actions=[
+                "aoss:CreateIndex",
+                "aoss:DeleteIndex",
+                "aoss:UpdateIndex",
+                "aoss:DescribeIndex",
+                "aoss:ReadDocument",
+                "aoss:WriteDocument",
+            ],
+            resource=f"index/{collection_name}/*",
         )
 
-        index_handler.add_to_role_policy(
-            iam.PolicyStatement(
-                effect=iam.Effect.ALLOW,
-                actions=[
-                    "bedrock:InvokeModel",
-                    "bedrock:InvokeModelWithResponseStream",
-                    # adapt for s3 & OpenSearch
-                ],
-                resources=["arn:aws:bedrock:*::foundation-model/*"],
-            )
-        )
+        llm_handler.add_to_role_policy(opensearch_collection_access)
+        llm_handler.add_to_role_policy(opensearch_data_access)
