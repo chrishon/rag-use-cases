@@ -58,7 +58,8 @@ class KnowledgeBaseStack(Stack):
             resource=f"index/{collection_name}/*",
         )
 
-        function.add_to_role_policy
+        function.add_to_role_policy(opensearch_collection_access)
+        function.add_to_role_policy(opensearch_data_access)
 
         bucket = s3.Bucket(
             self,
