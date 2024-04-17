@@ -26,6 +26,7 @@ class BedrockRagStack(Stack):
 
         opensearch_endpoint = Fn.import_value("VectorDB-OpenSearchEndpoint")
         collection_name = Fn.import_value("VectorDB-OpenSearch-CollectionName")
+        vecotr_index_name = None  # TODO Import vector index name here from CFN outputs
 
         llm_handler = lambda_.Function(
             self,
@@ -35,7 +36,10 @@ class BedrockRagStack(Stack):
             code=lambda_.Code.from_asset("bedrock_rag/resources/llm_function"),
             memory_size=256,
             timeout=Duration.seconds(60 * 5),
-            environment={"opensearch_endpoint": opensearch_endpoint},
+            environment={
+                "opensearch_endpoint": opensearch_endpoint,
+                "vector_index_name": vecotr_index_name,
+            },  # TODO get vector index name
         )
 
         llm_handler.add_to_role_policy(
