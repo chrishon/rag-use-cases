@@ -128,21 +128,10 @@ class VectorDBServerlessStack(Stack):
             indent=2,
         )
 
-        data_access_policy_name = f"{collection_name}-policy"
-
-        cfn_access_policy = aoss.CfnAccessPolicy(
-            self,
-            "OpssDataAccessPolicy",
-            name=data_access_policy_name,
-            description="Policy for data access",
-            policy=data_access_policy,
-            type="data",
-        )
-
         CfnOutput(
             self,
             "OpenSearchEndpoint",
-            value=collection.attr_collection_endpoint,
+            value=collection.attr_collection_endpoint.replace("https://", ""),
             export_name=f"VectorDB-OpenSearchEndpoint",
         )
         CfnOutput(
