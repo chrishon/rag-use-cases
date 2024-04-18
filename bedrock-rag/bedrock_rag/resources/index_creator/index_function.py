@@ -45,21 +45,30 @@ def on_event(event, context):
 
 
 def on_create(event):
-    index_name = "vector-index"
-    index_body = {"settings": {"index": {"number_of_shards": 4}}}
-    client.indices.create
+    index_name = "vector"
+    index_body = {
+        "settings": {"index": {"knn": True}},
+        "mappings": {
+            "properties": {
+                "vectors": {
+                    "type": "knn_vector",
+                    "dimension": 1536,
+                    "method": {
+                        "engine": "nmslib",
+                        "name": "hnsw",
+                    },
+                }
+            }
+        },
+    }
+    client.indices.create(index=index_name, body=index_body)
 
-    return {"PhysicalResourceId": physical_id}
+    return {"statusCode": 200, "body": "Successfully created the vector index"}
 
 
 def on_update(event):
-    physical_id = event["PhysicalResourceId"]
-    props = event["ResourceProperties"]
-    print("update resource %s with props %s" % (physical_id, props))
-    # ...
+    pass
 
 
 def on_delete(event):
-    physical_id = event["PhysicalResourceId"]
-    print("delete resource %s" % physical_id)
-    # ...
+    pass
