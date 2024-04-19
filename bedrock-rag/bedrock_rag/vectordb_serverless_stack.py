@@ -10,6 +10,7 @@ from aws_cdk import (
     aws_ec2 as ec2,
     CfnOutput,
     CustomResource,
+    custom_resources,
 )
 from constructs import Construct
 
@@ -127,11 +128,11 @@ class VectorDBServerlessStack(Stack):
             ],
             indent=2,
         )
-
+        endpoint = collection.attr_collection_endpoint.replace("https://", "")
         CfnOutput(
             self,
             "OpenSearchEndpoint",
-            value=collection.attr_collection_endpoint.replace("https://", ""),
+            value=endpoint,
             export_name=f"VectorDB-OpenSearchEndpoint",
         )
         CfnOutput(
@@ -149,29 +150,30 @@ class VectorDBServerlessStack(Stack):
 
         index_function = lambda_.Function(
             self,
-            "LLMHandler",
+            "Indexhandler",
             runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="index_function.index_handler",  # Assuming index.py with a function named handler
-            code=lambda_.Code.from_asset("bedrock_rag/resources/index_creator"),
+            handler="index_function.on_event",  # Assuming index.py with a function named handler
+            code=lambda_.Code.from_asset("bedrock_rag/resources/index_creator.zip"),
             memory_size=256,
-            timeout=Duration.seconds(60 * 5),
+            timeout=Duration.seconds(60 * 10),
             environment={
-                "opensearch_endpoint": collection.attr_collection_endpoint,
+                "opensearch_endpoint": endpoint,
                 "vector_index_name": "vector-index",
                 "collection_name": collection_name,
             },
         )
 
-        opensearch_collection_access = iam.PolicyDocument(
+        opensearch_collection_access = iam.PolicyStatement(
             actions=[
                 "aoss:CreateCollectionItems",
                 "aoss:DeleteCollectionItems",
                 "aoss:UpdateCollectionItems",
                 "aoss:DescribeCollectionItems",
             ],
-            resource=f"collection/{collection_name}",
+            resources=[f"arn:aws:aoss:*:*:collection/*"],
         )
-        opensearch_data_access = iam.PolicyDocument(
+
+        opensearch_data_access = iam.PolicyStatement(
             actions=[
                 "aoss:CreateIndex",
                 "aoss:DeleteIndex",
@@ -180,22 +182,17 @@ class VectorDBServerlessStack(Stack):
                 "aoss:ReadDocument",
                 "aoss:WriteDocument",
             ],
-            resource=f"index/{collection_name}/*",
+            resources=[f"arn:aws:aoss:*:*:index/*"],
         )
 
         index_function.add_to_role_policy(opensearch_collection_access)
         index_function.add_to_role_policy(opensearch_data_access)
+        res_provider = custom_resources.Provider(
+            self, "crProvider", on_event_handler=index_function
+        )
 
         custom_resource = CustomResource(
-            self,
-            "MyCustomResource",
-            provider=index_function,
-            properties={
-                "resources_to_configure": [
-                    # Pass ARNs or other identifiers of the resources to configure
-                    # Example: 'arn:aws:s3:::my-bucket'
-                ]
-            },
+            self, "MyCustomResource", service_token=res_provider.service_token
         )
 
 
