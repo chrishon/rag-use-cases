@@ -7,7 +7,8 @@ from bedrock_rag.bedrock_rag_stack import BedrockRagStack
 from bedrock_rag.network_stack import NetworkingStack
 from bedrock_rag.vectordb_stack import VectorDBStack
 from bedrock_rag.vectordb_serverless_stack import VectorDBServerlessStack
-from bedrock_rag.s3_knowledgebase_stack import S3Stack
+
+# from bedrock_rag.s3_knowledgebase_stack import S3Stack
 
 from config.constants import DEFAULT_DEPLOYMENT_REGION, DEFAULT_ACCOUNT
 import boto3
