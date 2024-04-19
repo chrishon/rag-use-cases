@@ -122,13 +122,25 @@ class VectorDBServerlessStack(Stack):
                             "ResourceType": "index",
                         },
                     ],
-                    "Principal": [f"{admin_user_arn}"],
+                    "Principal": [f"arn:aws:iam::{account}:root"],
                     "Description": "data-access-rule",
                 }
             ],
             indent=2,
         )
+
+        data_access_policy_name = f"{collection_name}-dataaccess-policy"
+
+        cfn_data_access_policy = aoss.CfnAccessPolicy(
+            self,
+            "DataAccessPpolicy",
+            policy=data_access_policy,
+            name=data_access_policy_name,
+            type="data",
+        )
+
         endpoint = collection.attr_collection_endpoint.replace("https://", "")
+
         CfnOutput(
             self,
             "OpenSearchEndpoint",
@@ -185,8 +197,13 @@ class VectorDBServerlessStack(Stack):
             resources=[f"arn:aws:aoss:*:*:index/*"],
         )
 
+        openseach_api_access = iam.PolicyStatement(
+            actions=["aoss:BatchGetCollection", "aoss:APIAccessAll"], resources=["*"]
+        )
+
         index_function.add_to_role_policy(opensearch_collection_access)
         index_function.add_to_role_policy(opensearch_data_access)
+        index_function.add_to_role_policy(openseach_api_access)
         res_provider = custom_resources.Provider(
             self, "crProvider", on_event_handler=index_function
         )
