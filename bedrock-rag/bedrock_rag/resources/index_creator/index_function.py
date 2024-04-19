@@ -16,6 +16,7 @@ bedrock = session.client(
 # instantiating the OpenSearch client, and passing in the CLI profile
 opensearch = session.client("opensearchserverless")
 host = os.getenv("opensearch_endpoint")
+host = host.replace("https://", "")
 region = "eu-central-1"
 service = "aoss"
 credentials = session.get_credentials()
