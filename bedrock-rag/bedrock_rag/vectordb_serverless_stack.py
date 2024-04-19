@@ -211,6 +211,3 @@ class VectorDBServerlessStack(Stack):
         custom_resource = CustomResource(
             self, "MyCustomResource", service_token=res_provider.service_token
         )
-
-
-# TODO: Create Vector Index in CDK
