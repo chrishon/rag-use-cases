@@ -22,7 +22,7 @@ env = cdk.Environment(account=DEFAULT_ACCOUNT, region=DEFAULT_DEPLOYMENT_REGION)
 vectorDBServerless = VectorDBServerlessStack(
     app, "vectorDBServerless", env=env, user_arn=user_arn
 )
-s3Stack = KnowledgeBaseStack(app, "S3Stack", env=env)
+s3Stack = KnowledgeBaseStack(app, "KnowledgeBaseStack", env=env)
 # networkStack = NetworkingStack(app, "NetworkStack", env=env)
 # vectorDBStack = VectorDBStack(
 #     app,
