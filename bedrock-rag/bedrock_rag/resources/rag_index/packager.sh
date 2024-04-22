@@ -1,4 +1,4 @@
-rm -R ./package
+rm -rf ./package
 rm rag_index_zipped.zip
 pip install --target ./package -r ./requirements.txt
 
