@@ -8,7 +8,7 @@ from bedrock_rag.network_stack import NetworkingStack
 from bedrock_rag.vectordb_stack import VectorDBStack
 from bedrock_rag.vectordb_serverless_stack import VectorDBServerlessStack
 
-# from bedrock_rag.s3_knowledgebase_stack import S3Stack
+from bedrock_rag.s3_knowledgebase_stack import KnowledgeBaseStack
 
 from config.constants import DEFAULT_DEPLOYMENT_REGION, DEFAULT_ACCOUNT
 import boto3
@@ -22,7 +22,7 @@ env = cdk.Environment(account=DEFAULT_ACCOUNT, region=DEFAULT_DEPLOYMENT_REGION)
 vectorDBServerless = VectorDBServerlessStack(
     app, "vectorDBServerless", env=env, user_arn=user_arn
 )
-# s3Stack = S3Stack(app, "S3Stack", env=env)
+s3Stack = KnowledgeBaseStack(app, "S3Stack", env=env)
 # networkStack = NetworkingStack(app, "NetworkStack", env=env)
 # vectorDBStack = VectorDBStack(
 #     app,

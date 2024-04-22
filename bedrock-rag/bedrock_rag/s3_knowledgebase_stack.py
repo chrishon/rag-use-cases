@@ -38,16 +38,17 @@ class KnowledgeBaseStack(Stack):
             resources=["arn:aws:bedrock:*::foundation-model/*"],
         )
 
-        opensearch_collection_access = iam.PolicyDocument(
+        opensearch_collection_access = iam.PolicyStatement(
             actions=[
                 "aoss:CreateCollectionItems",
                 "aoss:DeleteCollectionItems",
                 "aoss:UpdateCollectionItems",
                 "aoss:DescribeCollectionItems",
             ],
-            resource=f"collection/{collection_name}",
+            resources=[f"arn:aws:aoss:*:*:collection/*"],
         )
-        opensearch_data_access = iam.PolicyDocument(
+
+        opensearch_data_access = iam.PolicyStatement(
             actions=[
                 "aoss:CreateIndex",
                 "aoss:DeleteIndex",
@@ -56,11 +57,17 @@ class KnowledgeBaseStack(Stack):
                 "aoss:ReadDocument",
                 "aoss:WriteDocument",
             ],
-            resource=f"index/{collection_name}/*",
+            resources=[f"arn:aws:aoss:*:*:index/*"],
+        )
+
+        openseach_api_access = iam.PolicyStatement(
+            actions=["aoss:BatchGetCollection", "aoss:APIAccessAll"], resources=["*"]
         )
 
         function.add_to_role_policy(opensearch_collection_access)
         function.add_to_role_policy(opensearch_data_access)
+        function.add_to_role_policy(openseach_api_access)
+        function.add_to_role_policy(bedrock_access)
 
         bucket = s3.Bucket(
             self,
@@ -71,4 +78,4 @@ class KnowledgeBaseStack(Stack):
         notification = notifications.LambdaDestination(function)
 
         # assign notification for the s3 event type (ex: OBJECT_CREATED)
-        s3.add_event_notification(s3.EventType.OBJECT_CREATED, notification)
+        bucket.add_event_notification(s3.EventType.OBJECT_CREATED, notification)
