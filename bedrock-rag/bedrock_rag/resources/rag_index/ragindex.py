@@ -7,7 +7,7 @@ from langchain.text_splitter import (
     RecursiveCharacterTextSplitter,
 )
 from langchain.document_loaders import PyPDFLoader, PyPDFDirectoryLoader
-from langchain_community.document_loaders import S3FileLoader
+
 
 # from dotenv import load_dotenv
 # loading in environment variables
@@ -25,6 +25,7 @@ s3 = session.resource("s3")
 
 # Instantiating the OpenSearch client, with specific CLI profile
 host = os.getenv("opensearch_endpoint")
+host = host.replace("https://", "")
 
 region = "eu-central-1"
 service = "aoss"
@@ -69,9 +70,13 @@ def splitter(documents):
         f"Average length among {len(doc)} documents (after split) is {avg_char_count_post} characters."
     )
 
+    return doc
+
 
 def load_document(bucket, key):
-    loader = S3FileLoader(bucket, key)
+    local_file_name = "/tmp/" + key
+    s3.Bucket(bucket).download_file(key, local_file_name)
+    loader = PyPDFLoader(local_file_name)
     documents = loader.load()
 
     return documents
@@ -106,7 +111,9 @@ def indexDoc(client, vectors, text):
     indexDocument = {os.getenv("vector_field_name"): vectors, "text": text}
     # Configuring the specific index
     response = client.index(
-        index=os.getenv("vector_index_name"), body=indexDocument, refresh=False
+        index=os.getenv("vector_index_name", "vector"),
+        body=indexDocument,
+        refresh=False,
     )
     return response
 
@@ -122,16 +129,10 @@ def indexer(event, context):
     # TODO: Change PDF loader and chunker
 
     # split document
-    chunks = splitter(document)
+    doc = splitter(document)
 
     # get embedding for chunk and save it to OSS
-    for chunk in chunks:
-        embedding_vector = get_embedding(chunk)
-        indexDoc(client, embedding_vector, chunk)
 
-    return {"statusCode": 200, "document": bucket + "/" + key}
-
-    # The process of iterating through each chunk of the document you are trying to index, and generate embeddings for.
     for i in doc:
         # The text data of each chunk
         exampleContent = i.page_content
@@ -145,4 +146,5 @@ def indexer(event, context):
         # calling the indexDoc function, passing in the OpenSearch Client, the created vector, and corresponding text data
         # TODO: If you wanted to add metadata you would pass it in here
         indexDoc(client, vectors, text)
-    return
+
+    return {"statusCode": 200, "document": bucket + "/" + key}

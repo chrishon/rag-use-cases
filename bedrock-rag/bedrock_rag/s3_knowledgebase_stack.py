@@ -32,6 +32,8 @@ class KnowledgeBaseStack(Stack):
         #     architecture=_lambda.Architecture.ARM_64,
         # )
 
+        vector_index_name = Fn.import_value("Vector-Index-Name")
+
         function = _lambda.DockerImageFunction(
             self,
             "MyLambdaFunction",
@@ -41,7 +43,10 @@ class KnowledgeBaseStack(Stack):
             memory_size=512,  # Set memory size as needed
             timeout=Duration.seconds(60 * 5),  # Set timeout as needed
             architecture=_lambda.Architecture.ARM_64,
-            environment={"opensearch_endpoint": opensearch_endpoint},
+            environment={
+                "opensearch_endpoint": opensearch_endpoint,
+                "vector_index_name": vector_index_name,
+            },
         )
 
         bedrock_access = iam.PolicyStatement(

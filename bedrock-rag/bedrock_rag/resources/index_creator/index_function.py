@@ -16,6 +16,7 @@ bedrock = session.client(
 # instantiating the OpenSearch client, and passing in the CLI profile
 opensearch = session.client("opensearchserverless")
 host = os.getenv("opensearch_endpoint")
+index_name = os.getenv("vector_index_name", "vector")
 host = host.replace("https://", "")
 region = "eu-central-1"
 service = "aoss"
@@ -46,7 +47,7 @@ def on_event(event, context):
 
 
 def on_create(event):
-    index_name = "vector"
+    index_name = index_name
     index_body = {
         "settings": {"index": {"knn": True}},
         "mappings": {

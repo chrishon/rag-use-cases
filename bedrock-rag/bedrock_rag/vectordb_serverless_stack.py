@@ -170,7 +170,7 @@ class VectorDBServerlessStack(Stack):
             timeout=Duration.seconds(60 * 10),
             environment={
                 "opensearch_endpoint": endpoint,
-                "vector_index_name": "vector-index",
+                "vector_index_name": "vector",
                 "collection_name": collection_name,
             },
         )
@@ -210,4 +210,11 @@ class VectorDBServerlessStack(Stack):
 
         custom_resource = CustomResource(
             self, "MyCustomResource", service_token=res_provider.service_token
+        )
+
+        CfnOutput(
+            self,
+            "vector_index_name",
+            value="vector",
+            export_name=f"Vector-Index-Name",
         )
