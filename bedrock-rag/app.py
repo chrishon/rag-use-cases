@@ -23,6 +23,9 @@ vectorDBServerless = VectorDBServerlessStack(
     app, "vectorDBServerless", env=env, user_arn=user_arn
 )
 s3Stack = KnowledgeBaseStack(app, "KnowledgeBaseStack", env=env)
+
+bedrockstack = BedrockRagStack(app, "BedrockRagStack", env=env)
+
 # networkStack = NetworkingStack(app, "NetworkStack", env=env)
 # vectorDBStack = VectorDBStack(
 #     app,
@@ -30,10 +33,5 @@ s3Stack = KnowledgeBaseStack(app, "KnowledgeBaseStack", env=env)
 #     vpc=networkStack.primary_vpc,
 #     subnets=networkStack.primary_vpc.isolated_subnets,
 #     env=env,
-# )
-# BedrockRagStack(
-#     app,
-#     "BedrockRagStack",
-#     vpc_id=networkStack.primary_vpc,
 # )
 app.synth()

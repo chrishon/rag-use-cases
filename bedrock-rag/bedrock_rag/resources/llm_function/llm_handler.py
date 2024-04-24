@@ -15,6 +15,7 @@ bedrock = session.client(
 # instantiating the OpenSearch client, and passing in the CLI profile
 opensearch = session.client("opensearchserverless")
 host = os.getenv("opensearch_endpoint")
+host = host.replace("https://", "")
 region = "eu-central-1"
 service = "aoss"
 credentials = session.get_credentials()
@@ -34,11 +35,9 @@ def llm_handler(event, context):
     user_input = event.get("body")
     if user_input is None:
         return {"statusCode": 400, "body": "No body found in the event"}
-    try:
-        answer = answer_query(user_input=user_input)
-        return {"statusCode": 200, "body": answer}
-    except:
-        return {"statusCode": 400, "body": "Not able to process user input"}
+
+    answer = answer_query(user_input=user_input)
+    return {"statusCode": 200, "body": answer}
 
 
 def get_embedding(body):
@@ -84,9 +83,7 @@ def answer_query(user_input):
         "fields": ["text"],
     }
     # performing the search on OpenSearch passing in the query parameters constructed above
-    response = client.search(
-        body=query, index=os.getenv("vector_index_name", "vector-index")
-    )
+    response = client.search(body=query, index=os.getenv("vector_index_name", "vector"))
 
     # Format Json responses into text
     similaritysearchResponse = ""
