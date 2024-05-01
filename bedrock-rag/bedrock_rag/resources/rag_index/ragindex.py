@@ -108,7 +108,7 @@ def indexDoc(client, vectors, text):
     :return: The confirmation that the document was indexed successfully.
     """
     # TODO: You can add more metadata fields if you wanted to!
-    indexDocument = {os.getenv("vector_field_name"): vectors, "text": text}
+    indexDocument = {os.getenv("vector_field_name", "vectors"): vectors, "text": text}
     # Configuring the specific index
     response = client.index(
         index=os.getenv("vector_index_name", "vector"),
