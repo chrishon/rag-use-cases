@@ -32,11 +32,14 @@ client = OpenSearch(
 
 
 def llm_handler(event, context):
-    user_input = event.get("body")
+    print("Received event:", event)
+    body = event.get("body")
+    user_input = body.get("query")
+    user_context = body.get("user_context")
     if user_input is None:
         return {"statusCode": 400, "body": "No body found in the event"}
 
-    answer = answer_query(user_input=user_input)
+    answer = answer_query(user_input=user_input, user_context=user_context)
     return {"statusCode": 200, "body": answer}
 
 
@@ -60,7 +63,7 @@ def get_embedding(body):
     return embedding
 
 
-def answer_query(user_input):
+def answer_query(user_input, user_context=None):
     """
     This function takes the user question, creates an embedding of that question,
     and performs a KNN search on your Amazon OpenSearch Index. Using the most similar results it feeds that into the Prompt
@@ -95,20 +98,21 @@ def answer_query(user_input):
         )
 
         similaritysearchResponse = similaritysearchResponse
+
     # Configuring the Prompt for the LLM
     # TODO: EDIT THIS PROMPT TO OPTIMIZE FOR YOUR USE CASE
     prompt_data = f"""\n\nHuman: You are an AI assistant that will help people answer questions they have. Answer the provided question to the best of your ability using the information provided in the Context. 
     Summarize the answer and provide sources to where the relevant information can be found. 
     Include this at the end of the response.
     Provide information based on the context provided.
-    Format the output in human readable format - use paragraphs and bullet lists when applicable
-    Answer in detail with no preamble
-    If you are unable to answer accurately, please say so.
+    Format your output in markdown format!
     Please mention the sources of where the answers came from by referring to page numbers, specific books and chapters!
 
     Question: {userQuery}
 
     Here is the text you should use as context: {similaritysearchResponse}
+    
+    Here is your past interaction with the user during the session_ {user_context}
 
     \n\nAssistant:
 
@@ -137,4 +141,5 @@ def answer_query(user_input):
     # the final string returned to the end user
     answer = response_body["content"][0]["text"]
     # returning the final string to the end user
+
     return answer
