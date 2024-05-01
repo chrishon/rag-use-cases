@@ -91,3 +91,5 @@ class BedrockRagStack(Stack):
         llm_handler.add_to_role_policy(openseach_api_access)
 
         query_api = api.LambdaRestApi(self, "Endpoint", handler=llm_handler)
+        llm_resource = query_api.root.add_resource("askme")
+        llm_resource.add_method("GET")
