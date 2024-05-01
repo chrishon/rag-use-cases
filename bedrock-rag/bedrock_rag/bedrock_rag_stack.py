@@ -92,4 +92,4 @@ class BedrockRagStack(Stack):
 
         query_api = api.LambdaRestApi(self, "Endpoint", handler=llm_handler)
         llm_resource = query_api.root.add_resource("askme")
-        llm_resource.add_method("GET")
+        llm_resource.add_method("POST")
