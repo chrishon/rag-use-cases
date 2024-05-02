@@ -27,7 +27,7 @@ jobs:
         cd bedrock-rag/bedrock_rag/resources/llm_function
         mkdir temp
         pip install --target temp/ -r requirements.txt
-        cd llm_handler.py temp/
+        cp llm_handler.py temp/
 
     - name: Zip the folder
       run: |
