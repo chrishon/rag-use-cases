@@ -37,7 +37,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: llm_handler.zip
-        path: ../
+        path: bedrock-rag/bedrock_rag/resources/
 
     - name: Clean up
       run: rm -rf package
