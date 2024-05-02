@@ -34,8 +34,11 @@ client = OpenSearch(
 def llm_handler(event, context):
     print("Received event:", event)
     body = event.get("body")
-    user_input = body.get("query")
-    user_context = body.get("user_context")
+    json_body = json.loads(body)
+    user_input = json_body.get("query")
+    user_context = json_body.get("user_context")
+    print(f"User Input is: {user_input}")
+    print(f"User Context is: {user_context}")
     if user_input is None:
         return {"statusCode": 400, "body": "No body found in the event"}
 
