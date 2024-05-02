@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - bedrock-rag/bedrock_rag/resources/llm_function/**
+      - .github/workflows/llm_handler.yml
 
 jobs:
   package:
@@ -28,9 +29,6 @@ jobs:
         mkdir temp
         pip install --target temp/ -r requirements.txt
         cp llm_handler.py temp/
-
-    - name: Zip the folder
-      run: |
         cd temp
         zip -r llm_handler.zip .
         cp llm_handler.zip ../
@@ -38,7 +36,7 @@ jobs:
     - name: Upload the package as an artifact
       uses: actions/upload-artifact@v2
       with:
-        name: python-package
+        name: llm_handler.zip
         path: ../
 
     - name: Clean up
