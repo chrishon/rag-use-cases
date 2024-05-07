@@ -33,5 +33,6 @@ done
 
 echo "Cleaning up temporary files..."
 rm -rf temp_libs/
+cd ../../config
 
 
