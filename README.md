@@ -3,5 +3,5 @@ This repository contains Retrieval Augmented Generation (RAG) use cases that can
 
 | Demo      | Description           |
 |-------------|-----------------------|
-| [Bedrock with OpenSearch (and Textract)](bedrock-rag/README.md) | Serverless RAG Demo, fully deployable as a CDK App |
+| [Bedrock with OpenSearch (and Textract)](bedrock-rag/) | Serverless RAG Demo, fully deployable as a CDK App |
 
