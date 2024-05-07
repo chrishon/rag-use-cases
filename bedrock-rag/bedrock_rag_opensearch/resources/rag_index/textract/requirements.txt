@@ -7,5 +7,7 @@ langchain==0.1.11
 pypdf
 opensearch-py==2.3.1
 unstructured==0.7.12
-  
+amazon-textract-textractor
+amazon-textract-caller
+langchain-community    
 

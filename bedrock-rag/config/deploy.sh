@@ -4,6 +4,15 @@
 echo "Please enter the AWS profile name:"
 read profile_name
 
+echo 
+read -p "Do you want to use Textract Parsing? (y/n)" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]];
+then
+   export TEXTRACT_PROCESSING=true
+fi
+
+
 echo "Preparing for deployment, will first run script to package functions for the Lambda deployment..."
 bash ./packager.sh
 # Check if profile name is provided
@@ -14,7 +23,7 @@ fi
 cd ..
 # Execute cdk bootstrap with the provided profile name
 cdk bootstrap --profile "$profile_name"
-cdk deploy vectorDBServerlessStack --require-approval never
+cdk deploy vectorDBServerless --require-approval never
 cdk deploy KnowledgeBaseStack --require-approval never
 cdk deploy BedrockRagStack --require-approval never
 

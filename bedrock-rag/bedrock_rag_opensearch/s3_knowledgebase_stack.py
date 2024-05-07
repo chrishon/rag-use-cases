@@ -14,7 +14,9 @@ from constructs import Construct
 
 class KnowledgeBaseStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(
+        self, scope: Construct, construct_id: str, use_textract: bool, **kwargs
+    ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         opensearch_endpoint = Fn.import_value("VectorDB-OpenSearchEndpoint")
@@ -34,12 +36,14 @@ class KnowledgeBaseStack(Stack):
 
         vector_index_name = Fn.import_value("Vector-Index-Name")
 
+        dockerfile_path = "bedrock_rag_opensearch/resources/rag_index/"
+        if use_textract:
+            dockerfile_path += "textract/"
+
         function = _lambda.DockerImageFunction(
             self,
             "MyLambdaFunction",
-            code=_lambda.DockerImageCode.from_image_asset(
-                "bedrock_rag_opensearch/resources/rag_index/"
-            ),
+            code=_lambda.DockerImageCode.from_image_asset(dockerfile_path),
             memory_size=512,  # Set memory size as needed
             timeout=Duration.seconds(60 * 5),  # Set timeout as needed
             architecture=_lambda.Architecture.ARM_64,
@@ -79,6 +83,12 @@ class KnowledgeBaseStack(Stack):
         openseach_api_access = iam.PolicyStatement(
             actions=["aoss:BatchGetCollection", "aoss:APIAccessAll"], resources=["*"]
         )
+
+        if use_textract:
+            textract_access = iam.PolicyStatement(
+                actions=["textract:*"], resources=["*"]
+            )
+            function.add_to_role_policy(textract_access)
 
         function.add_to_role_policy(opensearch_collection_access)
         function.add_to_role_policy(opensearch_data_access)

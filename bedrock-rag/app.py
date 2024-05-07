@@ -12,9 +12,11 @@ from bedrock_rag_opensearch.s3_knowledgebase_stack import KnowledgeBaseStack
 
 from config.constants import DEFAULT_DEPLOYMENT_REGION, DEFAULT_ACCOUNT
 import boto3
+import os
 
 iam = boto3.client("iam")
 user_arn = iam.get_user()["User"]["Arn"]
+use_textract = os.environ.get("TEXTRACT_PROCESSING", False)
 
 
 app = cdk.App()
@@ -22,7 +24,9 @@ env = cdk.Environment(account=DEFAULT_ACCOUNT, region=DEFAULT_DEPLOYMENT_REGION)
 vectorDBServerless = VectorDBServerlessStack(
     app, "vectorDBServerless", env=env, user_arn=user_arn
 )
-s3Stack = KnowledgeBaseStack(app, "KnowledgeBaseStack", env=env)
+s3Stack = KnowledgeBaseStack(
+    app, "KnowledgeBaseStack", env=env, use_textract=use_textract
+)
 
 bedrockstack = BedrockRagStack(app, "BedrockRagStack", env=env)
 
