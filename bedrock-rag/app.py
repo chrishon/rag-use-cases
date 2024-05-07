@@ -3,12 +3,12 @@ import os
 
 import aws_cdk as cdk
 
-from bedrock_rag.bedrock_rag_stack import BedrockRagStack
-from bedrock_rag.network_stack import NetworkingStack
-from bedrock_rag.vectordb_stack import VectorDBStack
-from bedrock_rag.vectordb_serverless_stack import VectorDBServerlessStack
+from bedrock_rag_opensearch.bedrock_rag_stack import BedrockRagStack
+from bedrock_rag_opensearch.network_stack import NetworkingStack
+from bedrock_rag_opensearch.vectordb_stack import VectorDBStack
+from bedrock_rag_opensearch.vectordb_serverless_stack import VectorDBServerlessStack
 
-from bedrock_rag.s3_knowledgebase_stack import KnowledgeBaseStack
+from bedrock_rag_opensearch.s3_knowledgebase_stack import KnowledgeBaseStack
 
 from config.constants import DEFAULT_DEPLOYMENT_REGION, DEFAULT_ACCOUNT
 import boto3

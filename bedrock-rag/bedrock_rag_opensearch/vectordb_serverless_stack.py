@@ -166,7 +166,7 @@ class VectorDBServerlessStack(Stack):
             runtime=lambda_.Runtime.PYTHON_3_10,
             handler="index_function.on_event",  # Assuming index.py with a function named handler
             code=lambda_.Code.from_asset(
-                "bedrock_rag_opensearch/resources/index_creator.zip"
+                "bedrock_rag_opensearch/resources/index_function.zip"
             ),
             memory_size=256,
             timeout=Duration.seconds(60 * 10),

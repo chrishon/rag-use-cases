@@ -35,7 +35,7 @@ class BedrockRagStack(Stack):
             runtime=lambda_.Runtime.PYTHON_3_10,
             handler="llm_handler.llm_handler",
             code=lambda_.Code.from_asset(
-                "bedrock_rag_opensearch/resources/llm_handler.zip"
+                "bedrock_rag_opensearch/resources/llm_function.zip"
             ),
             memory_size=256,
             timeout=Duration.seconds(60 * 5),

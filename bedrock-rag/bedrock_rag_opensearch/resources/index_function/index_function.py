@@ -47,7 +47,6 @@ def on_event(event, context):
 
 
 def on_create(event):
-    index_name = index_name
     index_body = {
         "settings": {"index": {"knn": True}},
         "mappings": {
