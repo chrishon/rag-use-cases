@@ -2,7 +2,7 @@
 
 # Navigate to the resources directory
 echo "Start packaging for Lambda functions"
-cd ../resources
+cd ../bedrock_rag_opensearch/resources
 
 # Create a temporary directory for storing installed packages
 mkdir temp_libs
