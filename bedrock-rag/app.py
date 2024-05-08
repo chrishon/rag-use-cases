@@ -10,7 +10,7 @@ from bedrock_rag_opensearch.vectordb_serverless_stack import VectorDBServerlessS
 
 from bedrock_rag_opensearch.s3_knowledgebase_stack import KnowledgeBaseStack
 
-from config.constants import DEFAULT_DEPLOYMENT_REGION, DEFAULT_ACCOUNT
+
 import boto3
 import os
 
