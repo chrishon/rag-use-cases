@@ -6,7 +6,12 @@ import aws_cdk as cdk
 from bedrock_knowledgebase_pinecone.bedrock_knowledgebase_pinecone_stack import BedrockKnowledgebasePineconeStack
 
 
+PROFILE_NAME = os.environ.get("PROFILE_NAME")
+ACCOUNT_ID = os.environ.get("ACCOUNT_ID")
+AWS_REGION = os.environ.get("AWS_REGION", "eu-central-1")
+
 app = cdk.App()
+env = cdk.Environment(account=ACCOUNT_ID, region=AWS_REGION)
 BedrockKnowledgebasePineconeStack(app, "BedrockKnowledgebasePineconeStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
