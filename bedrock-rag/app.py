@@ -18,9 +18,12 @@ iam = boto3.client("iam")
 user_arn = iam.get_user()["User"]["Arn"]
 use_textract = os.environ.get("TEXTRACT_PROCESSING", False)
 
+PROFILE_NAME = os.environ.get("PROFILE_NAME")
+ACCOUNT_ID = os.environ.get("ACCOUNT_ID")
+AWS_REGION = os.environ.get("AWS_REGION", "eu-central-1")
 
 app = cdk.App()
-env = cdk.Environment(account=DEFAULT_ACCOUNT, region=DEFAULT_DEPLOYMENT_REGION)
+env = cdk.Environment(account=ACCOUNT_ID, region=AWS_REGION)
 vectorDBServerless = VectorDBServerlessStack(
     app, "vectorDBServerless", env=env, user_arn=user_arn
 )

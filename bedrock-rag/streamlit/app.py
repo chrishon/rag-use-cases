@@ -1,8 +1,9 @@
 import streamlit as st
 import requests
 import json
+import os
 
-endpoint = "https://1c4p8zfk1c.execute-api.eu-central-1.amazonaws.com/prod/askme"
+endpoint = os.environ.get("LLM_ENDPOINT")
 content_window = ""
 
 # Header/Title of streamlit app
@@ -43,6 +44,7 @@ if question := st.chat_input("Ask about your data stored in your knowledge base"
                 json={
                     "query": question,
                     "user_context": st.session_state.session_state,
+                    "person": "Blake",
                 },
             )
 
