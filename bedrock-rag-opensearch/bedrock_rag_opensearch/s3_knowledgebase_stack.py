@@ -80,7 +80,7 @@ class KnowledgeBaseStack(Stack):
             resources=[f"arn:aws:aoss:*:*:index/*"],
         )
 
-        openseach_api_access = iam.PolicyStatement(
+        opensearch_api_access = iam.PolicyStatement(
             actions=["aoss:BatchGetCollection", "aoss:APIAccessAll"], resources=["*"]
         )
 
@@ -92,7 +92,7 @@ class KnowledgeBaseStack(Stack):
 
         function.add_to_role_policy(opensearch_collection_access)
         function.add_to_role_policy(opensearch_data_access)
-        function.add_to_role_policy(openseach_api_access)
+        function.add_to_role_policy(opensearch_api_access)
         function.add_to_role_policy(bedrock_access)
 
         bucket = s3.Bucket(

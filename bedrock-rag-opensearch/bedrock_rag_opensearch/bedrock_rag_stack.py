@@ -8,6 +8,7 @@ from aws_cdk import (
     Duration,
     Fn,
     aws_apigateway as api,
+    aws_ssm as ssm,
     # aws_sqs as sqs,
 )
 from constructs import Construct
@@ -95,3 +96,7 @@ class BedrockRagStack(Stack):
         query_api = api.LambdaRestApi(self, "Endpoint", handler=llm_handler)
         llm_resource = query_api.root.add_resource("askme")
         llm_resource.add_method("POST")
+
+        api_param = ssm.StringParameter(
+            self, "LLMAPI", parameter_name="rag_api_url", string_value=query_api.url
+        )

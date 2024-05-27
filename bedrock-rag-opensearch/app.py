@@ -15,7 +15,7 @@ import boto3
 import os
 
 iam = boto3.client("iam")
-user_arn = iam.get_user()["User"]["Arn"]
+
 use_textract = os.environ.get("TEXTRACT_PROCESSING", False)
 
 PROFILE_NAME = os.environ.get("PROFILE_NAME")
@@ -25,7 +25,9 @@ AWS_REGION = os.environ.get("AWS_REGION", "eu-central-1")
 app = cdk.App()
 env = cdk.Environment(account=ACCOUNT_ID, region=AWS_REGION)
 vectorDBServerless = VectorDBServerlessStack(
-    app, "vectorDBServerless", env=env, user_arn=user_arn
+    app,
+    "vectorDBServerless",
+    env=env,
 )
 s3Stack = KnowledgeBaseStack(
     app, "KnowledgeBaseStack", env=env, use_textract=use_textract
